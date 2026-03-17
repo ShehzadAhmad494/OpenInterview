@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProfileModule } from './profile/profile.module';
+import { OpeninterviewModule } from './openinterview/openinterview.module';
 
 @Module({
   imports: [
@@ -17,9 +16,7 @@ import { ProfileModule } from './profile/profile.module';
       autoLoadEntities: true,
     }),
 
-    UserModule,
-
-    ProfileModule,
+    OpeninterviewModule,
   ],
   controllers: [AppController],
   providers: [AppService],
