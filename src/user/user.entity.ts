@@ -7,10 +7,10 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Profile } from '../profile/profile.entity';
-import { Entitlement } from './entitlement.entity';
-import { File } from './file.entity';
-import { Booking } from './booking.entity';
-import { Availability } from './availability.entity';
+import { Entitlement } from '../Entities/entitlement.entity';
+import { File } from '../Entities/file.entity';
+import { Booking } from '../Entities/booking.entity';
+import { Availability } from '../Entities/availability.entity';
 
 @Entity('users')
 export class User {
@@ -26,8 +26,13 @@ export class User {
   @Column({ type: 'varchar', length: 250 })
   password_hash: string;
 
-  @Column({ type: 'varchar', length: 255, unique: true })
+  // fixed for local strategy -----> may be same or null (local)
+  @Column({ type: 'varchar', length: 255, nullable: true, unique: true })
   google_id: string;
+
+  // add provider (local or google) -----> Fix 👉
+  @Column({ type: 'varchar', default: 'local' })
+  provider: string;
 
   @Column({ type: 'text', nullable: true }) // Optional avatar
   avatar: string;

@@ -7,10 +7,13 @@ import { OpeninterviewModule } from './openinterview/openinterview.module';
 import { ProfileModule } from './profile/profile.module';
 // import { ProileService } from './proile/proile.service';
 import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true, // user environment variable anywhere
+    }),
 
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -24,6 +27,8 @@ import { AuthModule } from './auth/auth.module';
     ProfileModule,
 
     AuthModule,
+
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

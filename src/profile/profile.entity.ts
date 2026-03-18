@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { User } from '../Entities/user.entity';
+import { User } from '../user/user.entity';
 import { File } from '../Entities/file.entity';
 import { Booking } from '../Entities/booking.entity';
 

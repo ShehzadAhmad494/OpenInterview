@@ -4,14 +4,14 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany
+  OneToMany,
 } from 'typeorm';
 import { Entitlement } from './entitlement.entity';
 
 @Entity('plans')
 export class Plan {
   @PrimaryColumn({ type: 'varchar', length: 50 })
-  code: string;  // e.g., free, core, pro, elite
+  code: string; // e.g., free, core, pro, elite
 
   @Column({ type: 'varchar', length: 100 })
   name: string;

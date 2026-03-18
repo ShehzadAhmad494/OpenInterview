@@ -12,6 +12,8 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+Auth_Readme.md
+
 # OS
 .DS_Store
 

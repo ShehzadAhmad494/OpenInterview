@@ -7,7 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from './user.entity';
+import { User } from '../user/user.entity';
 import { Profile } from '../profile/profile.entity';
 
 @Entity('bookings')
@@ -16,7 +16,9 @@ export class Booking {
   id: string;
 
   // Relation to Profile
-  @ManyToOne(() => Profile, (profile) => profile.bookings, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Profile, (profile) => profile.bookings, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'profile_id' })
   profile: Profile;
 

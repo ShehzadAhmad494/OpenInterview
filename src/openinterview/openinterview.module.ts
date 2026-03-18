@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { OpeninterviewService } from './openinterview.service';
 import { OpeninterviewController } from './openinterview.controller';
-import { User } from 'src/Entities/user.entity';
+import { User } from 'src/user/user.entity';
 import { Entitlement } from 'src/Entities/entitlement.entity';
 import { File } from 'src/Entities/file.entity';
 import { Profile } from 'src/profile/profile.entity';
@@ -12,7 +12,7 @@ import { Availability } from 'src/Entities/availability.entity';
 import { AnalyticsEvent } from 'src/Entities/analytics.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 @Module({
-   imports: [
+  imports: [
     TypeOrmModule.forFeature([
       User,
       Profile,
@@ -26,6 +26,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     ]),
   ],
   providers: [OpeninterviewService],
-  controllers: [OpeninterviewController]
+  controllers: [OpeninterviewController],
 })
 export class OpeninterviewModule {}
