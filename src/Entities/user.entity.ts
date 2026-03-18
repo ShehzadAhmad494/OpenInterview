@@ -6,7 +6,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { Profile } from './profile.entity';
+import { Profile } from '../profile/profile.entity';
 import { Entitlement } from './entitlement.entity';
 import { File } from './file.entity';
 import { Booking } from './booking.entity';

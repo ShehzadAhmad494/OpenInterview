@@ -4,7 +4,7 @@ import { OpeninterviewController } from './openinterview.controller';
 import { User } from 'src/Entities/user.entity';
 import { Entitlement } from 'src/Entities/entitlement.entity';
 import { File } from 'src/Entities/file.entity';
-import { Profile } from 'src/Entities/profile.entity';
+import { Profile } from 'src/profile/profile.entity';
 import { StripeWebhookEvent } from 'src/Entities/stripe_webhook_event.entity';
 import { Plan } from 'src/Entities/plan.entity';
 import { Booking } from 'src/Entities/booking.entity';

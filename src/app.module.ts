@@ -4,6 +4,9 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { OpeninterviewModule } from './openinterview/openinterview.module';
+import { ProfileModule } from './profile/profile.module';
+// import { ProileService } from './proile/proile.service';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -17,6 +20,10 @@ import { OpeninterviewModule } from './openinterview/openinterview.module';
     }),
 
     OpeninterviewModule,
+
+    ProfileModule,
+
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

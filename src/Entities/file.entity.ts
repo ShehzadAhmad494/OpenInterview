@@ -7,7 +7,7 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
-import { Profile } from './profile.entity';
+import { Profile } from '../profile/profile.entity';
 
 @Entity('files')
 export class File {

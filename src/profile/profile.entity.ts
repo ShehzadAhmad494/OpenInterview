@@ -8,9 +8,9 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { User } from './user.entity';
-import { File } from './file.entity';
-import { Booking } from './booking.entity';
+import { User } from '../Entities/user.entity';
+import { File } from '../Entities/file.entity';
+import { Booking } from '../Entities/booking.entity';
 
 @Entity('profiles')
 export class Profile {
