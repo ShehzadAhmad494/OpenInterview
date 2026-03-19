@@ -8,9 +8,9 @@ import {
 } from 'typeorm';
 import { Profile } from '../profile/profile.entity';
 import { Entitlement } from '../Entities/entitlement.entity';
-import { File } from '../Entities/file.entity';
-import { Booking } from '../Entities/booking.entity';
-import { Availability } from '../Entities/availability.entity';
+import { File } from '../file/file.entity';
+import { Booking } from '../booking/booking.entity';
+import { Availability } from '../availability/availability.entity';
 
 @Entity('users')
 export class User {

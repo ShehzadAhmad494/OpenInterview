@@ -6,11 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+// import { SupabaseAuthGuard } from 'src/auth/supabase_auth/supabase_auth.guard';
 
 @Controller('users')
 export class UserController {
@@ -21,6 +23,8 @@ export class UserController {
     return this.service.create(dto);
   }
 
+  // Guard Implementation
+  // @UseGuards(SupabaseAuthGuard)
   @Get()
   findAll() {
     return this.service.findAll();

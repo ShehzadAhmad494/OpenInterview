@@ -6,8 +6,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { OpeninterviewModule } from './openinterview/openinterview.module';
 import { ProfileModule } from './profile/profile.module';
 // import { ProileService } from './proile/proile.service';
-import { AuthModule } from './auth/auth.module';
+// import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
+import { BookingModule } from './booking/booking.module';
+import { FileModule } from './file/file.module';
+import { AvailabilityModule } from './availability/availability.module';
 
 @Module({
   imports: [
@@ -26,9 +29,15 @@ import { UserModule } from './user/user.module';
 
     ProfileModule,
 
-    AuthModule,
+    // AuthModule,
 
     UserModule,
+
+    BookingModule,
+
+    FileModule,
+
+    AvailabilityModule,
   ],
   controllers: [AppController],
   providers: [AppService],

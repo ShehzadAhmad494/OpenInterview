@@ -9,8 +9,8 @@ import {
   OneToMany,
 } from 'typeorm';
 import { User } from '../user/user.entity';
-import { File } from '../Entities/file.entity';
-import { Booking } from '../Entities/booking.entity';
+import { File } from '../file/file.entity';
+import { Booking } from '../booking/booking.entity';
 
 @Entity('profiles')
 export class Profile {
