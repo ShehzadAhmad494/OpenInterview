@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateBookingDto } from './dto/booking.dto';
 import { User } from 'src/user/user.entity';
 import { Profile } from 'src/profile/profile.entity';
@@ -6,7 +10,7 @@ import { Booking } from './booking.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
-import { UpdateBookingDto } from './dto/update_booking.dto';// We'll create this DTO
+import { UpdateBookingDto } from './dto/update_booking.dto'; // We'll create this DTO
 
 @Injectable()
 export class BookingService {
@@ -26,7 +30,9 @@ export class BookingService {
     const user = await this.userRepo.findOne({ where: { id: dto.user_id } });
     if (!user) throw new BadRequestException('User not found');
 
-    const profile = await this.profileRepo.findOne({ where: { id: dto.profile_id } });
+    const profile = await this.profileRepo.findOne({
+      where: { id: dto.profile_id },
+    });
     if (!profile) throw new BadRequestException('Profile not found');
 
     const booking = this.bookingRepo.create({

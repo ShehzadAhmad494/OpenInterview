@@ -21,8 +21,8 @@ export class FileController {
     @UploadedFile() file: Express.Multer.File,
     @Body(new ValidationPipe({ whitelist: true })) body: UploadFileDto,
   ) {
-  //   console.log('file object:', file);
-  // console.log('file.path:', file?.path);
+    //   console.log('file object:', file);
+    // console.log('file.path:', file?.path);
     return this.fileService.uploadFile(file, body);
   }
 }

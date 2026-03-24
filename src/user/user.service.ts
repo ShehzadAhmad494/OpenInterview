@@ -38,6 +38,19 @@ export class UserService {
       relations: ['profiles'], // agar relation defined hai
     });
   }
+   // find the user by email
+  async findByEmail(email: string) {
+    const user = await this.userRepo.findOne({
+      where: { email },
+      relations: ['profiles'],
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
 
   async findOne(id: string) {
     const user = await this.userRepo.findOne({
