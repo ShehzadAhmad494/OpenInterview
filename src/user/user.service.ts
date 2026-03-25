@@ -65,6 +65,14 @@ export class UserService {
     return user;
   }
 
+  // Saved Method (Currently Needed in Refresh Token )
+  // async save(user: User) {
+  //  return this.userRepository.save(user);
+  // }
+  async save(user: User){
+    return this.userRepo.save(user);
+  }
+
   async update(id: string, dto: UpdateUserDto) {
     const user = await this.findOne(id);
 

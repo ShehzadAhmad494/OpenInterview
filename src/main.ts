@@ -7,6 +7,8 @@ config();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   // apply Global Validation on DTO
+  // for Google Auth 
+  // app.setGlobalPrefix('api');
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

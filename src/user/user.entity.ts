@@ -45,7 +45,10 @@ export class User {
 
   @Column({ type: 'varchar', length: 50, default: 'user' })
   role: string;
-
+  // Add Column for Refresh Token ( we need this to store our refresh token in db)
+  // why null ---> existing users ke pass refresh token nahi hoga
+  @Column({ type: 'text', nullable: true })
+  refresh_token: string;
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
   created_at: Date;
 

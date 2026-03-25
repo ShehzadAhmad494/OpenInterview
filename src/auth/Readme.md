@@ -1,121 +1,103 @@
-# 📝 NestJS JWT Authentication Project - Summary & Guide
+
+# 📝 NestJS JWT Authentication - Refresh Token Flow
 
 ## 1️⃣ Project Overview
 
-Ye project ek **NestJS + TypeORM + PostgreSQL backend** hai jisme humne **User Signup, Login, JWT authentication, aur protected routes** implement kiye hain.
+NestJS + TypeORM + PostgreSQL backend with:
 
-Key Features:
-
-* ✅ User Signup (email, password, name)
-* ✅ Password hashing with bcrypt
-* ✅ Login with email & password
-* ✅ JWT Access Token (15 min expiry) & Refresh Token
+* ✅ User Signup & Login
+* ✅ Password hashing (bcrypt)
+* ✅ JWT Authentication (Access & Refresh Tokens)
 * ✅ Protected routes using JWT Guard
 
 ---
 
-## 2️⃣ Steps Followed (Signup & Login Flow)
+## 2️⃣ Key Concepts 🔑
+
+**Access Token** 🔑
+
+* Short-lived (e.g., 15 min)
+* Sent in **JSON**
+* Used for accessing protected routes
+
+**Refresh Token** 🔄
+
+* Long-lived (e.g., 7 days)
+* Sent in **HttpOnly Cookie** → prevents XSS
+* Stored in **DB hashed** (bcrypt)
+* Used to generate new access tokens without re-login
+
+**Token Rotation** 🔁
+
+* Each refresh request:
+
+  1. Verify old refresh token ✅
+  2. Generate new access + refresh token
+  3. Hash & replace refresh token in DB
+* Prevents token reuse by attackers
+
+**HttpOnly Cookies** 🍪
+
+* Cannot be accessed via JavaScript
+* Store refresh tokens securely
+
+---
+
+## 3️⃣ Implementation Steps 🔧
 
 ### Signup Flow 🛠️
 
-1. Client signup request bhejta hai → `{ email, password, name }`
-2. Backend check karta hai agar **email already exists**
-3. Agar email available → password ko **bcrypt** se hash kiya jata hai
-4. Naya user **database me save** hota hai
-5. Response me **user id aur email** return hoti hai
+1. Client sends `{ email, password, name }`
+2. Check if user exists → throw error if yes
+3. Hash password with bcrypt
+4. Save new user in DB
+5. Return user id & email
 
 ### Login Flow 🔑
 
-1. Client login request bhejta hai → `{ email, password }`
-2. Backend check karta hai **email exist karta hai ya nahi**
-3. Password ko **bcrypt compare** karta hai
-4. Agar match ho → **JWT Access Token** generate hota hai
-5. Client token ko **Authorization header** me use karke protected routes access kar sakta hai
+1. Validate email & password
+2. Generate **Access Token** & **Refresh Token**
+3. Hash refresh token → save in DB
+4. Return **access token in JSON** & **refresh token in HttpOnly cookie**
+
+### Refresh Flow 🔄
+
+1. Receive refresh token from cookie (or body for testing)
+2. Verify JWT & extract user id
+3. Compare hashed refresh token with DB
+4. Generate new access + refresh token
+5. Hash new refresh token → save in DB
+6. Return new **access token** (JSON) & set new cookie
 
 ---
 
-## 3️⃣ Problems Faced & Solutions 🐞➡️💡
+## 4️⃣ Controller & DTO Tips ✨
 
-### 3.1 JWT Secret Key Not Loaded ❌
-
-* **Error:** `Error: secretOrPrivateKey must have a value`
-* **Cause:** Circular dependency ki waja se `.env` ka `JWT_SECRET` load nahi ho raha tha
-* **Solution:**
-
-  * `forwardRef(() => UserModule)` use kiya **circular dependency break karne ke liye**
-  * AuthModule ke `JwtModule.register({ secret: process.env.JWT_SECRET })` me secret ab load ho gaya ✅
-
-### 3.2 Circular Dependency 🔄
-
-* **Definition:** Jab **Module A import karta hai Module B** aur **Module B import karta hai Module A**, NestJS me ye circular dependency kehlata hai
-* **Problem:** Ye backend me token secret ya services ko resolve nahi kar pata
-* **Fix:** `forwardRef(() => ModuleName)` use karna hota hai
-
-### 3.3 Route Conflicts - Static vs Dynamic 🚦
-
-* **Error:** `invalid input syntax for type uuid: "me"`
-* **Cause:**
-
-  * `/users/me` route define kiya
-  * Lekin pehle `/users/:id` dynamic route define tha → NestJS `me` ko `:id` samajh raha tha
-* **Solution:**
-
-  * **Static routes ko pehle define karo**
-  * Dynamic routes ko baad me rakho
-
-```ts
-@Get('me') // static route first
-@Get(':id') // dynamic route after
-```
+* Use `RefreshDto` with `@IsString()` and `@IsNotEmpty()`
+* ValidationPipe ensures `"property should not exist"` errors are prevented
+* Keep refresh endpoint `/auth/refresh` separate from login
 
 ---
 
-## 4️⃣ JWT Tokens - How They Work 🔑
+## 5️⃣ Security Layers 🛡️
 
-* **Access Token:**
-
-  * Short-lived (15 min)
-  * Client har protected request me Authorization header me bhejta hai
-* **Refresh Token:**
-
-  * Long-lived (optional)
-  * Access token expire hone pe new access token generate karne ke liye use hota hai
-
-**Testing Tip:** Postman me:
-
-* Signup → Login → Copy Access Token → Authorization Header: `Bearer <token>` → Access protected route `/users/me`
+1. HttpOnly cookie for refresh token
+2. Secure cookie (production)
+3. Hash token in DB
+4. Token rotation
+5. Reuse detection
 
 ---
 
-## 5️⃣ JWT Guard - Protecting Routes 🛡️
-
-* Guard check karta hai ki **Authorization header me valid token hai ya nahi**
-* Agar token valid → `req.user` me payload attach hota hai
-* Protected route me use:
-
-```ts
-@Get('me')
-@UseGuards(JwtAuthGuard)
-getMe(@Req() req) {
-  return { message: 'Protected route accessed', user: req.user };
-}
-```
-
-* **Static vs Dynamic Route Issue:** Ensure `/me` route **dynamic `/users/:id` ke pehle** ho
-
----
-
-## 6️⃣ Key Learnings ✨
-
-* NestJS me **module dependencies** ka order aur circular references ka handling bohot important hai
-* JWT ke liye **secret key** environment variable me hona chahiye
-* Password hashing with bcrypt is a must
-* Route order matters: static routes pehle, dynamic routes baad me
-
----
-
-✅ **Ready for Testing in Postman:**
+## 6️⃣ Testing Flow 🧪
 
 1. Signup → `/auth/signup`
-2. Login → `/auth/login` → get JWT token
-3. Protected Route → `/users/me` → header: `Authorization: Bearer <token>`
+2. Login → `/auth/login` → get access + refresh tokens
+3. Access protected route → `/users/me` → Authorization header: `Bearer <access_token>`
+4. Refresh tokens → `/auth/refresh` → get new access token
+5. Logout → clear cookie + remove refresh token from DB
+
+---
+
+✅ **Outcome:**
+Secure JWT Authentication with **refresh token rotation** implemented and tested.
