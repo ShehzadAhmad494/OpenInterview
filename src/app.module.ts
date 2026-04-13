@@ -12,6 +12,7 @@ import { BookingModule } from './booking/booking.module';
 import { FileModule } from './file/file.module';
 import { AvailabilityModule } from './availability/availability.module';
 import { AuthModule } from './auth/auth.module';
+import { EndpointSyncModule } from './endpoint-sync/endpoint-sync.module';
 
 @Module({
   imports: [
@@ -41,6 +42,8 @@ import { AuthModule } from './auth/auth.module';
     AvailabilityModule,
 
     AuthModule,
+// End Point Sync Module
+    EndpointSyncModule,
   ],
   controllers: [AppController],
   providers: [AppService],

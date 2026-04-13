@@ -19,14 +19,11 @@ export class AuthService {
   ) {}
 
   /*
-   * User Signup (Local Authentication)
+   * Local Signup
    */
-
-
   async signup(dto: SignUpDto) {
     const { email, password, name } = dto;
 
-    // Check if user already exists
     let existingUser: User | null = null;
     try {
       existingUser = await this.userService.findByEmail(email);
@@ -38,10 +35,8 @@ export class AuthService {
       throw new BadRequestException('User already exists');
     }
 
-    // Hash password before storing
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user
     const newUser = await this.userService.create({
       email,
       name,
@@ -53,24 +48,17 @@ export class AuthService {
       user: {
         id: newUser.id,
         email: newUser.email,
+        role: newUser.role, // optional but useful
       },
     };
   }
 
-  /**
-   * Login Flow (Access + Refresh Tokens)
-   * Steps:
-   * 1. Validate user credentials
-   * 2. Generate Access Token
-   * 3. Generate Refresh Token
-   * 4. Hash Refresh Token
-   * 5. Store in DB
-   * 6. Return tokens
+  /*
+   * Local Login
    */
   async login(dto: LoginDto) {
     const { email, password } = dto;
 
-    // Find user by email
     let user: User;
     try {
       user = await this.userService.findByEmail(email);
@@ -78,63 +66,52 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Compare password
     const isMatch = await bcrypt.compare(password, user.password_hash);
     if (!isMatch) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Create JWT payload
-    const payload = { sub: user.id, email: user.email };
-
-    // Generate Access Token (short lived)
-    const accessToken = this.jwtService.sign(payload, {
-      expiresIn: '1m',
-    });
-
-    // Generate Refresh Token (long lived)
-    const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: '7d',
-    });
-
-    // Hash Refresh Token before storing
-    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-
-    // Save hashed refresh token in DB
-    user.refresh_token = hashedRefreshToken;
-    await this.userService.save(user);
-
-    return {
-      message: 'Login successful',
-      access_token: accessToken,
-      refresh_token: refreshToken, // temporary (later cookie)
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-      },
-    };
+    return this.generateTokens(user);
   }
 
-  /**
-   * Refresh Token Rotation Logic
-   *
-   * Flow:
-   * 1. Receive refresh token
-   * 2. Verify JWT
-   * 3. Extract payload
-   * 4. Find user
-   * 5. Compare hashed token
-   * 6. Generate new access token
-   * 7. Generate new refresh token
-   * 8. Hash new refresh token
-   * 9. Save in DB
-   * 10. Return new tokens
+  /*
+   * Google Login
+   */
+  async googleLogin(profile: any) {
+    const email = profile.emails?.[0]?.value;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const name = profile.displayName;
+    const googleId = profile.id;
+
+    if (!email) {
+      throw new UnauthorizedException('Google email not found');
+    }
+
+    let user: User | null = null;
+
+    try {
+      user = await this.userService.findByEmail(email);
+    } catch (error) {
+      console.log('New Google user');
+    }
+
+    if (!user) {
+      user = await this.userService.create({
+        email,
+        name,
+        google_id: googleId,
+      });
+    }
+
+    return this.generateTokens(user);
+  }
+
+  /*
+   * Refresh Token Rotation
    */
   async refreshToken(dto: RefreshDto) {
     const { refresh_token } = dto;
 
-    // Verify refresh token
     let payload;
     try {
       payload = this.jwtService.verify(refresh_token);
@@ -142,45 +119,73 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    // Find user from payload
     const user = await this.userService.findOne(payload.sub);
     if (!user || !user.refresh_token) {
       throw new UnauthorizedException('Access denied');
     }
 
-    // Compare incoming token with DB hashed token
     const isMatch = await bcrypt.compare(refresh_token, user.refresh_token);
 
     if (!isMatch) {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    // Create new payload
-    const newPayload = {
+    return this.generateTokens(user);
+  }
+
+  /*
+   * Logout (Remove Refresh Token)
+   */
+  async logout(userId: number) {
+    const user = await this.userService.findOne(userId.toString());
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    user.refresh_token = null;
+    await this.userService.save(user);
+
+    return {
+      message: 'Logout successful',
+    };
+  }
+
+  /*
+   * Common Token Generator
+   * (Used by Local + Google + Refresh)
+   */
+  private async generateTokens(user: User) {
+    // ROLE ADDED HERE (IMPORTANT FOR AUTHORIZATION)
+    const payload = {
       sub: user.id,
       email: user.email,
+      role: user.role,
     };
 
-    // Generate new access token
-    const newAccessToken = this.jwtService.sign(newPayload, {
+    const accessToken = this.jwtService.sign(payload, {
       expiresIn: '15m',
     });
 
-    // Generate new refresh token (rotation)
-    const newRefreshToken = this.jwtService.sign(newPayload, {
+    const refreshToken = this.jwtService.sign(payload, {
       expiresIn: '7d',
     });
 
-    // Hash new refresh token
-    const hashedRefreshToken = await bcrypt.hash(newRefreshToken, 10);
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
 
-    // Save new refresh token in DB
     user.refresh_token = hashedRefreshToken;
     await this.userService.save(user);
 
     return {
-      access_token: newAccessToken,
-      refresh_token: newRefreshToken,
+      message: 'Authentication successful',
+      access_token: accessToken,
+      refresh_token: refreshToken,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role, //  send role to frontend
+      },
     };
   }
 }

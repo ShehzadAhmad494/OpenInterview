@@ -44,11 +44,11 @@ export class User {
   timezone: string;
 
   @Column({ type: 'varchar', length: 50, default: 'user' })
-  role: string;
+  role: string[]; // user can have multiple roles (e.g., ['user', 'admin'])
   // Add Column for Refresh Token ( we need this to store our refresh token in db)
   // why null ---> existing users ke pass refresh token nahi hoga
   @Column({ type: 'text', nullable: true })
-  refresh_token: string;
+  refresh_token: string | null;
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
   created_at: Date;
 

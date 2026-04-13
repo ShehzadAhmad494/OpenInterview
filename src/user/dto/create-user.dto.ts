@@ -19,7 +19,7 @@ export class CreateUserDto {
 
   @IsString()
   @MinLength(6)
-  password_hash: string;
+  password_hash?: string;
 
   @IsOptional()
   @IsString()
@@ -39,5 +39,5 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsIn(['user', 'admin'])
-  role?: string;
+  role?: string[]; // user can have multiple roles (e.g., ['user', 'admin'])
 }

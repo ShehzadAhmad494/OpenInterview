@@ -14,19 +14,19 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt_auth.gaurd.ts/jwt_auth.gaurd.ts.guard';
-// import 
-import { User } from './user.entity';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { RolesGuard } from 'src/auth/guards/roles.gaurd';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly service: UserService) {}
 
-    @Get('me')
-  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   getMe(@Req() req) {
     return {
       message: 'Protected route accessed',
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       user: req.user,
     };
   }
@@ -37,6 +37,8 @@ export class UserController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'manager')
   findAll() {
     return this.service.findAll();
   }
@@ -48,15 +50,17 @@ export class UserController {
 
   @Get('by-email/:email')
   findByEmail(@Param('email') email: string) {
-    console.log('EMAIL API HIT');
     return this.service.findByEmail(email);
   }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
     return this.service.update(id, dto);
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   remove(@Param('id') id: string) {
     return this.service.remove(id);
   }
